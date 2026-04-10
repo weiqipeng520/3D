@@ -503,6 +503,45 @@
             letter-spacing: 0.2em;
         }
 
+        /* ===================== 【新增】号码预测表格样式（和历史完全一样） ===================== */
+        .data-hm-table-wrap {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .data-hm-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-hm-table thead {
+            position: sticky;
+            top: 0;
+            background: var(--primary-light);
+            z-index: 10;
+        }
+        .data-hm-table th, .data-hm-table td {
+            padding: 14px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-hm-table th {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .data-hm-table tr:hover {
+            background: var(--primary-light);
+        }
+        .predict-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.2em;
+        }
+        .win-yes { color: var(--success); font-weight: 600; }
+        .win-no { color: var(--danger); font-weight: 600; }
+
         /* 内容显示控制 */
         .tab-content {
             display: none;
@@ -612,6 +651,7 @@
             <button class="tab-btn active" data-tab="deduction">号码推演</button>
             <button class="tab-btn" data-tab="history">历史数据</button>
             <button class="tab-btn" data-tab="stats">数据统计</button>
+            <button class="tab-btn" data-tab="data-hm">号码预测</button>
         </nav>
 
         <!-- 推演内容 -->
@@ -643,6 +683,26 @@
                 <div class="lucky7-number" id="lucky7Number"></div>
                 <p class="lucky7-desc" id="lucky7Desc"></p>
                 <p class="prob-text" id="probText"></p>
+            </div>
+        </div>
+
+        <!-- 【修复】号码预测内容（和历史数据一模一样） -->
+        <div class="tab-content" id="data-hm-content">
+            <div class="card">
+                <h2 class="card-title">福彩3D_7码组选----组六</h2>
+                <div class="data-hm-table-wrap">
+                    <table class="data-hm-table">
+                        <thead>
+                            <tr>
+                                <th>预测日期</th>
+                                <th>期号</th>
+                                <th>预测号码</th>
+                                <th>是否</th>
+                            </tr>
+                        </thead>
+                        <tbody id="predictTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -865,6 +925,37 @@
             "382":lucky7Library[1]
         };
 
+        // ===================== 【新增】你自己填写的预测数据（只在这里改） =====================
+        const myPredictData = [
+            { date: "2026-04-01", period: "2026081", number: "2356789", isWin: "中" },
+            { date: "2026-04-02", period: "2026082", number: "0123489", isWin: "中" },
+            { date: "2026-04-03", period: "2026083", number: "0156789", isWin: "中" },
+            { date: "2026-04-04", period: "2026084", number: "0345679", isWin: "中" },
+            { date: "2026-04-05", period: "2026085", number: "0123489", isWin: "挂" },
+            { date: "2026-04-06", period: "2026086", number: "2356789", isWin: "中" },
+            { date: "2026-04-07", period: "2026087", number: "0123489", isWin: "挂" },
+            { date: "2026-04-08", period: "2026088", number: "0156789", isWin: "中" },
+            { date: "2026-04-09", period: "2026089", number: "0123489", isWin: "挂" },
+            { date: "2026-04-10", period: "2026090", number: "1234567", isWin: "等待..." },
+        ];
+
+        // ===================== 【新增】渲染预测表格（纯新增） =====================
+        function renderPredictTable() {
+            const tbody = document.getElementById('predictTableBody');
+            let html = '';
+            myPredictData.slice().reverse().forEach(item => {
+                const cls = item.isWin === '中' ? 'win-yes' : 'win-no';
+                html += `
+                <tr>
+                    <td>${item.date}</td>
+                    <td>${item.period}</td>
+                    <td><span class="predict-number">${item.number}</span></td>
+                    <td><span class="${cls}">${item.isWin}</span></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
         // ===================== 辅助函数 =====================
         // 补零为3位数
         function pad3(num) {
@@ -1007,6 +1098,7 @@
         // 页面初始化
         renderHistoryTable();
         renderStats();
+        renderPredictTable(); // 【调用】渲染预测
         document.getElementById('latest-period').textContent = historyData[historyData.length - 1].period;
 
         // ===================== 标签切换功能 =====================
